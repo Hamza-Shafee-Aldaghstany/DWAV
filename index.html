@@ -169,17 +169,17 @@
                 .then(response => response.json())
                 .then(data => {
                     films = data;
-                    filteredFilms = films;
+                    filteredFilms = [...films]; // Ensure filteredFilms is a copy of films
                     displayFilms(filteredFilms);
                 })
                 .catch(error => console.error("Error loading data:", error));
         });
 
-        function displayFilms(filmsfix) {
+        function displayFilms(filmsToDisplay) {
             let tableBody = document.getElementById("filmTableBody");
             tableBody.innerHTML = "";
 
-            films.forEach(film => {
+            filmsToDisplay.forEach(film => {
                 let row = `<tr>
                     <td>${film.id}</td>
                     <td>${film.title}</td>
@@ -212,7 +212,6 @@
                 return comparison * sortDirections[columnIndex];
             });
 
-            // Toggle sort direction for next click
             sortDirections[columnIndex] *= -1;
 
             table.innerHTML = "";
@@ -220,37 +219,36 @@
         }
 
         function filterTable(field) {
-            let titleFilter = document.getElementById("titleFilter").value.trim();
+            let titleFilter = document.getElementById("titleFilter").value.trim().toLowerCase();
             let yearFromFilter = document.getElementById("yearFromFilter").value.trim();
             let yearToFilter = document.getElementById("yearToFilter").value.trim();
-            let directorFilter = document.getElementById("directorFilter").value.trim();
+            let directorFilter = document.getElementById("directorFilter").value.trim().toLowerCase();
             let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.trim();
-            let countryFilter = document.getElementById("countryFilter").value.trim();
+            let countryFilter = document.getElementById("countryFilter").value.trim().toLowerCase();
             let idFilter = document.getElementById("idFilter").value.trim();
 
-            let filtered = films.filter(film => {
-                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter.toLowerCase());
+            filteredFilms = films.filter(film => {
+                let titleMatch = titleFilter === "" || (film.title && film.title.toLowerCase().includes(titleFilter));
                 let yearMatch = (!yearFromFilter || film.release_year >= parseInt(yearFromFilter)) &&
                                (!yearToFilter || film.release_year <= parseInt(yearToFilter));
-                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter.toLowerCase()));
-                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toString().includes(boxOfficeFilter);
-                let countryMatch = !countryFilter || (film.country && film.country.toLowerCase().includes(countryFilter.toLowerCase()));
-                let idMatch = !idFilter || film.id.toString().includes(idFilter);
+                let directorMatch = directorFilter === "" || (film.director && film.director.toLowerCase().includes(directorFilter));
+                let boxOfficeMatch = boxOfficeFilter === "" || film.box_office.toString().includes(boxOfficeFilter);
+                let countryMatch = countryFilter === "" || (film.country && film.country.toLowerCase().includes(countryFilter));
+                let idMatch = idFilter === "" || film.id.toString().includes(idFilter);
 
                 return titleMatch && yearMatch && directorMatch && boxOfficeMatch && countryMatch && idMatch;
             });
 
             if (field === 'title' && titleFilter) {
-                showSuggestions(filtered, 'title', titleFilter);
+                showSuggestions(filteredFilms, 'title', titleFilter);
             } else if (field === 'director' && directorFilter) {
-                showSuggestions(filtered, 'director', directorFilter);
+                showSuggestions(filteredFilms, 'director', directorFilter);
             } else if (field === 'country' && countryFilter) {
-                showSuggestions(filtered, 'country', countryFilter);
+                showSuggestions(filteredFilms, 'country', countryFilter);
             } else {
                 document.getElementById("suggestions").style.display = "none";
             }
 
-            filteredFilms = filtered;
             displayFilms(filteredFilms);
         }
 
@@ -260,11 +258,11 @@
             suggestionsContainer.style.display = "block";
 
             let matches = filtered.map(film => {
-                if (field === 'title' && film.title.toLowerCase().includes(query.toLowerCase())) {
+                if (field === 'title' && film.title && film.title.toLowerCase().includes(query)) {
                     return film.title;
-                } else if (field === 'director' && film.director && film.director.toLowerCase().includes(query.toLowerCase())) {
+                } else if (field === 'director' && film.director && film.director.toLowerCase().includes(query)) {
                     return film.director;
-                } else if (field === 'country' && film.country && film.country.toLowerCase().includes(query.toLowerCase())) {
+                } else if (field === 'country' && film.country && film.country.toLowerCase().includes(query)) {
                     return film.country;
                 }
             }).filter(Boolean);
@@ -281,6 +279,10 @@
                 };
                 suggestionsContainer.appendChild(div);
             });
+
+            if (matches.length === 0) {
+                suggestionsContainer.style.display = "none";
+            }
         }
     </script>
 </body>

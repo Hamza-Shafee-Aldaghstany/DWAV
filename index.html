@@ -151,11 +151,11 @@
 
         <!-- Filter Inputs for each column -->
         <div id="filters">
-            <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
-            <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable('year')">
-            <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable('year')">
-            <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
-            <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
+            <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable()">
+            <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable()">
+            <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable()">
+            <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable()">
+            <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable()">
         </div>
 
         <!-- Suggestions Dropdown -->
@@ -180,6 +180,7 @@
         let films = [];
         let filteredFilms = [];
 
+        // Load data from JSON (replace the path with your actual path if necessary)
         document.addEventListener("DOMContentLoaded", function () {
             fetch("films.json")
                 .then(response => response.json())
@@ -213,78 +214,4 @@
 
             rows.sort((rowA, rowB) => {
                 let cellA = rowA.children[columnIndex].textContent.trim();
-                let cellB = rowB.children[columnIndex].textContent.trim();
-
-                if (columnIndex === 1) {
-                    return parseInt(cellA) - parseInt(cellB);
-                } else {
-                    return cellA.localeCompare(cellB);
-                }
-            });
-
-            table.innerHTML = "";
-            rows.forEach(row => table.appendChild(row));
-        }
-
-        // Strict filtering and suggestions
-        function filterTable(field) {
-            let titleFilter = document.getElementById("titleFilter").value.trim();
-            let yearFromFilter = document.getElementById("yearFromFilter").value.trim();
-            let yearToFilter = document.getElementById("yearToFilter").value.trim();
-            let directorFilter = document.getElementById("directorFilter").value.trim();
-            let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.trim();
-
-            let filtered = films.filter(film => {
-                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter.toLowerCase());
-                let yearMatch = (!yearFromFilter || film.release_year >= parseInt(yearFromFilter)) &&
-                                (!yearToFilter || film.release_year <= parseInt(yearToFilter));
-                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter.toLowerCase()));
-                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter.toLowerCase());
-
-                return titleMatch && yearMatch && directorMatch && boxOfficeMatch;
-            });
-
-            // Show suggestions if user is typing in any filter
-            if (field === 'title' && titleFilter) {
-                showSuggestions(filtered, 'title', titleFilter);
-            } else if (field === 'director' && directorFilter) {
-                showSuggestions(filtered, 'director', directorFilter);
-            } else {
-                document.getElementById("suggestions").style.display = "none";
-            }
-
-            filteredFilms = filtered;
-            displayFilms(filteredFilms);
-        }
-
-        // Show suggestions dynamically
-        function showSuggestions(filtered, field, query) {
-            let suggestionsContainer = document.getElementById("suggestions");
-            suggestionsContainer.innerHTML = "";
-            suggestionsContainer.style.display = "block";
-
-            let matches = filtered.map(film => {
-                if (field === 'title' && film.title.toLowerCase().includes(query.toLowerCase())) {
-                    return film.title;
-                } else if (field === 'director' && film.director && film.director.toLowerCase().includes(query.toLowerCase())) {
-                    return film.director;
-                }
-            }).filter(Boolean);
-
-            matches = [...new Set(matches)]; // Remove duplicates
-
-            matches.forEach(match => {
-                let div = document.createElement("div");
-                div.textContent = match;
-                div.onclick = function () {
-                    document.getElementById(field + "Filter").value = match;
-                    filterTable(field);
-                    suggestionsContainer.style.display = "none";
-                };
-                suggestionsContainer.appendChild(div);
-            });
-        }
-    </script>
-
-</body>
-</html>
+                let cellB = rowB.chil

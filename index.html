@@ -59,6 +59,10 @@
         <input type="number" id="yearFilter" placeholder="Search by Year" oninput="filterTable()">
         <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable()">
         <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable()">
+        
+        <!-- Year Range Filter -->
+        <input type="number" id="startYearFilter" placeholder="Start Year" oninput="filterTable()">
+        <input type="number" id="endYearFilter" placeholder="End Year" oninput="filterTable()">
     </div>
 
     <table>
@@ -123,12 +127,14 @@
             rows.forEach(row => table.appendChild(row));
         }
 
-        // Flexible Filtering function
+        // Flexible Filtering function with Year Range
         function filterTable() {
             let titleFilter = document.getElementById("titleFilter").value.toLowerCase();
             let yearFilter = document.getElementById("yearFilter").value;
             let directorFilter = document.getElementById("directorFilter").value.toLowerCase();
             let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.toLowerCase();
+            let startYearFilter = document.getElementById("startYearFilter").value;
+            let endYearFilter = document.getElementById("endYearFilter").value;
 
             let filteredFilms = films.filter(film => {
                 // Allow partial matches and case-insensitive search
@@ -137,7 +143,16 @@
                 let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter));
                 let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter);
 
-                return titleMatch && yearMatch && directorMatch && boxOfficeMatch;
+                // Filter by Year Range
+                let yearInRange = true;
+                if (startYearFilter) {
+                    yearInRange = film.release_year >= parseInt(startYearFilter);
+                }
+                if (endYearFilter) {
+                    yearInRange = yearInRange && film.release_year <= parseInt(endYearFilter);
+                }
+
+                return titleMatch && yearMatch && directorMatch && boxOfficeMatch && yearInRange;
             });
 
             displayFilms(filteredFilms);

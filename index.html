@@ -96,10 +96,16 @@
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.3s ease;
+            position: relative;
         }
 
         th:hover {
             opacity: 0.9;
+        }
+
+        th::after {
+            content: ' ↕';
+            font-size: 0.8em;
         }
 
         td {
@@ -156,6 +162,7 @@
     <script>
         let films = [];
         let filteredFilms = [];
+        let sortDirections = [1, 1, 1, 1, 1, 1]; // 1 for ascending, -1 for descending
 
         document.addEventListener("DOMContentLoaded", function () {
             fetch("films.json")
@@ -193,14 +200,20 @@
                 let cellA = rowA.children[columnIndex].textContent.trim();
                 let cellB = rowB.children[columnIndex].textContent.trim();
 
+                let comparison;
                 if (columnIndex === 0 || columnIndex === 2) { // ID or Year
-                    return parseInt(cellA) - parseInt(cellB);
+                    comparison = parseInt(cellA) - parseInt(cellB);
                 } else if (columnIndex === 4) { // Box Office
-                    return parseFloat(cellA.replace(/,/g, '')) - parseFloat(cellB.replace(/,/g, ''));
-                } else {
-                    return cellA.localeCompare(cellB);
+                    comparison = parseFloat(cellA.replace(/,/g, '')) - parseFloat(cellB.replace(/,/g, ''));
+                } else { // Title, Director, Country
+                    comparison = cellA.localeCompare(cellB);
                 }
+
+                return comparison * sortDirections[columnIndex];
             });
+
+            // Toggle sort direction for next click
+            sortDirections[columnIndex] *= -1;
 
             table.innerHTML = "";
             rows.forEach(row => table.appendChild(row));

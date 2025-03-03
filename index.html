@@ -17,6 +17,7 @@
 
         #filters {
             margin-bottom: 20px;
+            position: relative;
         }
 
         #filters input {
@@ -24,6 +25,26 @@
             width: 200px;
             margin: 5px;
             margin-right: 10px;
+        }
+
+        #suggestions {
+            position: absolute;
+            top: 35px;
+            left: 5px;
+            background-color: white;
+            border: 1px solid #ddd;
+            width: 220px;
+            z-index: 1000;
+            display: none;
+        }
+
+        #suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #suggestions div:hover {
+            background-color: #f0f0f0;
         }
 
         table {
@@ -55,14 +76,13 @@
 
     <!-- Filter Inputs for each column -->
     <div id="filters">
-        <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable()">
-        <input type="number" id="yearFilter" placeholder="Search by Year" oninput="filterTable()">
-        <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable()">
-        <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable()">
+        <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
+        <input type="number" id="yearFilter" placeholder="Search by Year" oninput="filterTable('year')">
+        <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
+        <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
         
-        <!-- Year Range Filter -->
-        <input type="number" id="startYearFilter" placeholder="Start Year" oninput="filterTable()">
-        <input type="number" id="endYearFilter" placeholder="End Year" oninput="filterTable()">
+        <!-- Suggestions Dropdown -->
+        <div id="suggestions"></div>
     </div>
 
     <table>
@@ -81,13 +101,15 @@
 
     <script>
         let films = [];
+        let filteredFilms = [];
 
         document.addEventListener("DOMContentLoaded", function () {
             fetch("films.json")
                 .then(response => response.json())
                 .then(data => {
                     films = data;
-                    displayFilms(films);
+                    filteredFilms = films;
+                    displayFilms(filteredFilms);
                 })
                 .catch(error => console.error("Error loading data:", error));
         });
@@ -127,35 +149,61 @@
             rows.forEach(row => table.appendChild(row));
         }
 
-        // Flexible Filtering function with Year Range
-        function filterTable() {
-            let titleFilter = document.getElementById("titleFilter").value.toLowerCase();
-            let yearFilter = document.getElementById("yearFilter").value;
-            let directorFilter = document.getElementById("directorFilter").value.toLowerCase();
-            let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.toLowerCase();
-            let startYearFilter = document.getElementById("startYearFilter").value;
-            let endYearFilter = document.getElementById("endYearFilter").value;
+        // Strict filtering and suggestions
+        function filterTable(field) {
+            let titleFilter = document.getElementById("titleFilter").value.trim();
+            let yearFilter = document.getElementById("yearFilter").value.trim();
+            let directorFilter = document.getElementById("directorFilter").value.trim();
+            let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.trim();
 
-            let filteredFilms = films.filter(film => {
-                // Allow partial matches and case-insensitive search
-                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter);
+            let filtered = films.filter(film => {
+                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter.toLowerCase());
                 let yearMatch = !yearFilter || film.release_year.toString().includes(yearFilter);
-                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter));
-                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter);
+                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter.toLowerCase()));
+                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter.toLowerCase());
 
-                // Filter by Year Range
-                let yearInRange = true;
-                if (startYearFilter) {
-                    yearInRange = film.release_year >= parseInt(startYearFilter);
-                }
-                if (endYearFilter) {
-                    yearInRange = yearInRange && film.release_year <= parseInt(endYearFilter);
-                }
-
-                return titleMatch && yearMatch && directorMatch && boxOfficeMatch && yearInRange;
+                return titleMatch && yearMatch && directorMatch && boxOfficeMatch;
             });
 
+            // Show suggestions if user is typing in any filter
+            if (field === 'title' && titleFilter) {
+                showSuggestions(filtered, 'title', titleFilter);
+            } else if (field === 'director' && directorFilter) {
+                showSuggestions(filtered, 'director', directorFilter);
+            } else {
+                document.getElementById("suggestions").style.display = "none";
+            }
+
+            filteredFilms = filtered;
             displayFilms(filteredFilms);
+        }
+
+        // Show suggestions dynamically
+        function showSuggestions(filtered, field, query) {
+            let suggestionsContainer = document.getElementById("suggestions");
+            suggestionsContainer.innerHTML = "";
+            suggestionsContainer.style.display = "block";
+
+            let matches = filtered.map(film => {
+                if (field === 'title' && film.title.toLowerCase().includes(query.toLowerCase())) {
+                    return film.title;
+                } else if (field === 'director' && film.director && film.director.toLowerCase().includes(query.toLowerCase())) {
+                    return film.director;
+                }
+            }).filter(Boolean);
+
+            matches = [...new Set(matches)]; // Remove duplicates
+
+            matches.forEach(match => {
+                let div = document.createElement("div");
+                div.textContent = match;
+                div.onclick = function () {
+                    document.getElementById(field + "Filter").value = match;
+                    filterTable(field);
+                    suggestionsContainer.style.display = "none";
+                };
+                suggestionsContainer.appendChild(div);
+            });
         }
     </script>
 </body>

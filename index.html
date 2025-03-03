@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highest Grossing Films</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        #filters {
+            margin-bottom: 20px;
+        }
+
+        #filters input {
+            padding: 8px;
+            width: 200px;
+            margin: 5px;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Highest-Grossing Films</h1>
+    </header>
+
+    <!-- Filter Inputs for each column -->
+    <div id="filters">
+        <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable()">
+        <input type="number" id="yearFilter" placeholder="Search by Year" oninput="filterTable()">
+        <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable()">
+        <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable()">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Title</th>
+                <th onclick="sortTable(1)">Year</th>
+                <th onclick="sortTable(2)">Director</th>
+                <th onclick="sortTable(3)">Box Office</th>
+            </tr>
+        </thead>
+        <tbody id="filmTableBody">
+            <!-- JavaScript will populate this -->
+        </tbody>
+    </table>
+
+    <script>
+        let films = [];
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("films.json")
+                .then(response => response.json())
+                .then(data => {
+                    films = data;
+                    displayFilms(films);
+                })
+                .catch(error => console.error("Error loading data:", error));
+        });
+
+        function displayFilms(films) {
+            let tableBody = document.getElementById("filmTableBody");
+            tableBody.innerHTML = "";
+
+            films.forEach(film => {
+                let row = `<tr>
+                    <td>${film.title}</td>
+                    <td>${film.release_year}</td>
+                    <td>${film.director || "N/A"}</td>
+                    <td>${film.box_office}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Sorting function
+        function sortTable(columnIndex) {
+            let table = document.querySelector("tbody");
+            let rows = Array.from(table.querySelectorAll("tr"));
+
+            rows.sort((rowA, rowB) => {
+                let cellA = rowA.children[columnIndex].textContent.trim();
+                let cellB = rowB.children[columnIndex].textContent.trim();
+
+                if (columnIndex === 1) {
+                    return parseInt(cellA) - parseInt(cellB);
+                } else {
+                    return cellA.localeCompare(cellB);
+                }
+            });
+
+            table.innerHTML = "";
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        // Filtering function
+        function filterTable() {
+            let titleFilter = document.getElementById("titleFilter").value.toLowerCase();
+            let yearFilter = document.getElementById("yearFilter").value;
+            let directorFilter = document.getElementById("directorFilter").value.toLowerCase();
+            let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.toLowerCase();
+
+            let filteredFilms = films.filter(film => {
+                return (
+                    (film.title.toLowerCase().includes(titleFilter) || !titleFilter) &&
+                    (film.release_year.toString().includes(yearFilter) || !yearFilter) &&
+                    (film.director.toLowerCase().includes(directorFilter) || !directorFilter) &&
+                    (film.box_office.toLowerCase().includes(boxOfficeFilter) || !boxOfficeFilter)
+                );
+            });
+
+            displayFilms(filteredFilms);
+        }
+    </script>
+</body>
+</html>

@@ -5,100 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Highest Grossing Films</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        /* Container for all content */
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        /* Header Styling */
         header {
-            margin-bottom: 20px;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
+        /* Filter Styling */
         #filters {
-            margin-bottom: 20px;
-            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         #filters input {
-            padding: 8px;
-            width: 200px;
-            margin: 5px;
-            margin-right: 10px;
+            padding: 12px;
+            width: 220px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
+        #filters input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Suggestions Dropdown Styling */
         #suggestions {
             position: absolute;
-            top: 35px;
+            top: 60px;
             left: 5px;
             background-color: white;
             border: 1px solid #ddd;
-            width: 220px;
+            width: 230px;
             z-index: 1000;
             display: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         #suggestions div {
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
+            font-size: 16px;
+            color: #333;
         }
 
         #suggestions div:hover {
-            background-color: #f0f0f0;
+            background-color: #007bff;
+            color: white;
         }
 
+        /* Table Styling */
         table {
-            width: 80%;
-            margin: auto;
+            width: 100%;
+            margin-top: 20px;
             border-collapse: collapse;
+            text-align: left;
         }
 
         th, td {
+            padding: 12px;
             border: 1px solid #ddd;
-            padding: 10px;
         }
 
         th {
             background-color: #007bff;
             color: white;
+            font-weight: bold;
             cursor: pointer;
         }
 
         th:hover {
             background-color: #0056b3;
         }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #filters {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #filters input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Highest-Grossing Films</h1>
-    </header>
 
-    <!-- Filter Inputs for each column -->
-    <div id="filters">
-        <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
-        <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable('year')">
-        <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable('year')">
-        <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
-        <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
-        
+    <div class="container">
+        <header>
+            <h1>Highest Grossing Films</h1>
+        </header>
+
+        <!-- Filter Inputs for each column -->
+        <div id="filters">
+            <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
+            <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable('year')">
+            <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable('year')">
+            <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
+            <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
+        </div>
+
         <!-- Suggestions Dropdown -->
         <div id="suggestions"></div>
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">Title</th>
-                <th onclick="sortTable(1)">Year</th>
-                <th onclick="sortTable(2)">Director</th>
-                <th onclick="sortTable(3)">Box Office</th>
-            </tr>
-        </thead>
-        <tbody id="filmTableBody">
-            <!-- JavaScript will populate this -->
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Title</th>
+                    <th onclick="sortTable(1)">Year</th>
+                    <th onclick="sortTable(2)">Director</th>
+                    <th onclick="sortTable(3)">Box Office</th>
+                </tr>
+            </thead>
+            <tbody id="filmTableBody">
+                <!-- JavaScript will populate this -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
         let films = [];
@@ -209,5 +285,6 @@
             });
         }
     </script>
+
 </body>
 </html>

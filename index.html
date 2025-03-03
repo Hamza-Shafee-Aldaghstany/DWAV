@@ -5,182 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Highest Grossing Films</title>
     <style>
-        /* General Styles */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 40px;
         }
 
         h1 {
-            color: #007bff;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             font-size: 2.5em;
         }
 
-        /* Container for all content */
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            overflow: hidden;
-        }
-
-        /* Header Styling */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        /* Filter Styling */
         #filters {
+            margin-bottom: 30px;
+            position: relative;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 30px;
         }
 
         #filters input {
-            padding: 12px;
+            padding: 12px 15px;
             width: 220px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            margin: 0;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
         }
 
         #filters input:focus {
-            border-color: #007bff;
             outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
         }
 
-        /* Suggestions Dropdown Styling */
         #suggestions {
             position: absolute;
-            top: 60px;
-            left: 5px;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
             background-color: white;
-            border: 1px solid #ddd;
-            width: 230px;
+            border-radius: 10px;
+            border: none;
+            width: 250px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 1000;
             display: none;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         #suggestions div {
             padding: 12px;
             cursor: pointer;
-            font-size: 16px;
-            color: #333;
+            transition: background-color 0.2s ease;
         }
 
         #suggestions div:hover {
-            background-color: #007bff;
-            color: white;
+            background-color: #e9ecef;
         }
 
-        /* Table Styling */
         table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            text-align: left;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
         }
 
         th {
-            background-color: #007bff;
+            background: linear-gradient(45deg, #007bff, #00b4d8);
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
+            transition: opacity 0.3s ease;
         }
 
         th:hover {
-            background-color: #0056b3;
+            opacity: 0.9;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
 
         tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            #filters {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            #filters input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            table {
-                font-size: 14px;
-            }
+            background-color: #f1f3f5;
+            transition: background-color 0.2s ease;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Highest-Grossing Films</h1>
+    </header>
 
-    <div class="container">
-        <header>
-            <h1>Highest Grossing Films</h1>
-        </header>
-
-        <!-- Filter Inputs for each column -->
-        <div id="filters">
-            <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable()">
-            <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable()">
-            <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable()">
-            <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable()">
-            <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable()">
-        </div>
-
-        <!-- Suggestions Dropdown -->
+    <div id="filters">
+        <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
+        <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable('year')">
+        <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable('year')">
+        <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
+        <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
+        
         <div id="suggestions"></div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Title</th>
-                    <th onclick="sortTable(1)">Year</th>
-                    <th onclick="sortTable(2)">Director</th>
-                    <th onclick="sortTable(3)">Box Office</th>
-                </tr>
-            </thead>
-            <tbody id="filmTableBody">
-                <!-- JavaScript will populate this -->
-            </tbody>
-        </table>
     </div>
 
+    <table>
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Title</th>
+                <th onclick="sortTable(1)">Year</th>
+                <th onclick="sortTable(2)">Director</th>
+                <th onclick="sortTable(3)">Box Office</th>
+            </tr>
+        </thead>
+        <tbody id="filmTableBody">
+        </tbody>
+    </table>
+
     <script>
+        // JavaScript remains the same as in your original code
         let films = [];
         let filteredFilms = [];
 
-        // Load data from JSON (replace the path with your actual path if necessary)
         document.addEventListener("DOMContentLoaded", function () {
             fetch("films.json")
                 .then(response => response.json())
@@ -207,11 +180,80 @@
             });
         }
 
-        // Sorting function
         function sortTable(columnIndex) {
             let table = document.querySelector("tbody");
             let rows = Array.from(table.querySelectorAll("tr"));
 
             rows.sort((rowA, rowB) => {
                 let cellA = rowA.children[columnIndex].textContent.trim();
-                let cellB = rowB.chil
+                let cellB = rowB.children[columnIndex].textContent.trim();
+
+                if (columnIndex === 1) {
+                    return parseInt(cellA) - parseInt(cellB);
+                } else {
+                    return cellA.localeCompare(cellB);
+                }
+            });
+
+            table.innerHTML = "";
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        function filterTable(field) {
+            let titleFilter = document.getElementById("titleFilter").value.trim();
+            let yearFromFilter = document.getElementById("yearFromFilter").value.trim();
+            let yearToFilter = document.getElementById("yearToFilter").value.trim();
+            let directorFilter = document.getElementById("directorFilter").value.trim();
+            let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.trim();
+
+            let filtered = films.filter(film => {
+                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter.toLowerCase());
+                let yearMatch = (!yearFromFilter || film.release_year >= parseInt(yearFromFilter)) &&
+                                (!yearToFilter || film.release_year <= parseInt(yearToFilter));
+                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter.toLowerCase()));
+                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter.toLowerCase());
+
+                return titleMatch && yearMatch && directorMatch && boxOfficeMatch;
+            });
+
+            if (field === 'title' && titleFilter) {
+                showSuggestions(filtered, 'title', titleFilter);
+            } else if (field === 'director' && directorFilter) {
+                showSuggestions(filtered, 'director', directorFilter);
+            } else {
+                document.getElementById("suggestions").style.display = "none";
+            }
+
+            filteredFilms = filtered;
+            displayFilms(filteredFilms);
+        }
+
+        function showSuggestions(filtered, field, query) {
+            let suggestionsContainer = document.getElementById("suggestions");
+            suggestionsContainer.innerHTML = "";
+            suggestionsContainer.style.display = "block";
+
+            let matches = filtered.map(film => {
+                if (field === 'title' && film.title.toLowerCase().includes(query.toLowerCase())) {
+                    return film.title;
+                } else if (field === 'director' && film.director && film.director.toLowerCase().includes(query.toLowerCase())) {
+                    return film.director;
+                }
+            }).filter(Boolean);
+
+            matches = [...new Set(matches)];
+
+            matches.forEach(match => {
+                let div = document.createElement("div");
+                div.textContent = match;
+                div.onclick = function () {
+                    document.getElementById(field + "Filter").value = match;
+                    filterTable(field);
+                    suggestionsContainer.style.display = "none";
+                };
+                suggestionsContainer.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>

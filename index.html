@@ -77,7 +77,8 @@
     <!-- Filter Inputs for each column -->
     <div id="filters">
         <input type="text" id="titleFilter" placeholder="Search by Title" oninput="filterTable('title')">
-        <input type="number" id="yearFilter" placeholder="Search by Year" oninput="filterTable('year')">
+        <input type="number" id="yearFromFilter" placeholder="From Year" oninput="filterTable('year')">
+        <input type="number" id="yearToFilter" placeholder="To Year" oninput="filterTable('year')">
         <input type="text" id="directorFilter" placeholder="Search by Director" oninput="filterTable('director')">
         <input type="text" id="boxOfficeFilter" placeholder="Search by Box Office" oninput="filterTable('boxOffice')">
         
@@ -152,13 +153,15 @@
         // Strict filtering and suggestions
         function filterTable(field) {
             let titleFilter = document.getElementById("titleFilter").value.trim();
-            let yearFilter = document.getElementById("yearFilter").value.trim();
+            let yearFromFilter = document.getElementById("yearFromFilter").value.trim();
+            let yearToFilter = document.getElementById("yearToFilter").value.trim();
             let directorFilter = document.getElementById("directorFilter").value.trim();
             let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.trim();
 
             let filtered = films.filter(film => {
                 let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter.toLowerCase());
-                let yearMatch = !yearFilter || film.release_year.toString().includes(yearFilter);
+                let yearMatch = (!yearFromFilter || film.release_year >= parseInt(yearFromFilter)) &&
+                                (!yearToFilter || film.release_year <= parseInt(yearToFilter));
                 let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter.toLowerCase()));
                 let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter.toLowerCase());
 

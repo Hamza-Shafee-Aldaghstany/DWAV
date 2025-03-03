@@ -123,7 +123,7 @@
             rows.forEach(row => table.appendChild(row));
         }
 
-        // Filtering function
+        // Flexible Filtering function
         function filterTable() {
             let titleFilter = document.getElementById("titleFilter").value.toLowerCase();
             let yearFilter = document.getElementById("yearFilter").value;
@@ -131,12 +131,13 @@
             let boxOfficeFilter = document.getElementById("boxOfficeFilter").value.toLowerCase();
 
             let filteredFilms = films.filter(film => {
-                return (
-                    (film.title.toLowerCase().includes(titleFilter) || !titleFilter) &&
-                    (film.release_year.toString().includes(yearFilter) || !yearFilter) &&
-                    (film.director.toLowerCase().includes(directorFilter) || !directorFilter) &&
-                    (film.box_office.toLowerCase().includes(boxOfficeFilter) || !boxOfficeFilter)
-                );
+                // Allow partial matches and case-insensitive search
+                let titleMatch = !titleFilter || film.title.toLowerCase().includes(titleFilter);
+                let yearMatch = !yearFilter || film.release_year.toString().includes(yearFilter);
+                let directorMatch = !directorFilter || (film.director && film.director.toLowerCase().includes(directorFilter));
+                let boxOfficeMatch = !boxOfficeFilter || film.box_office.toLowerCase().includes(boxOfficeFilter);
+
+                return titleMatch && yearMatch && directorMatch && boxOfficeMatch;
             });
 
             displayFilms(filteredFilms);
